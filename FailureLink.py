@@ -35,7 +35,7 @@
 # Further  modifications by Clinton Hall and dogzipp.
 # Web-site: http://nzbget.sourceforge.net/forum/viewforum.php?f=8.
 # License: GPLv2 (http://www.gnu.org/licenses/gpl.html).
-# PP-Script Version: 1.2
+# PP-Script Version: 1.21
 #
 #
 # NOTE: Make sure you run this script first (before any other PP-scripts).
@@ -63,6 +63,16 @@
 # Set this to yes in order to delete all corrupt and failed Files
 #Delete=no
 
+# Print more logging messages (yes, no).
+#
+# For debugging or if you need to report a bug.
+#Verbose=no
+
+# Check videos for corruption (yes, no).
+#
+# If disabled, ignore the settings below.
+#CheckVid=no
+
 # Absolute path for ffprobe.
 #
 # Enter the full path to ffprobe or avprobe here, or leave blank to search your system path.
@@ -77,12 +87,7 @@
 # Media Extensions
 #
 # This is a list of video/media extensions that will be checked for corruption.
-#mediaExtensions=.mkv,.avi,.divx,.xvid,.mov,.wmv,.mp4,.mpg,.mpeg,.vob,.iso,.ts
-
-# Print more logging messages (yes, no).
-#
-# For debugging or if you need to report a bug.
-#Verbose=no
+#mediaExtensions=.mkv,.avi,.divx,.xvid,.mov,.wmv,.mp4,.mpg,.mpeg,.vob,.ts
 
 ### NZBGET POST-PROCESSING SCRIPT                                          ###
 ##############################################################################
@@ -120,6 +125,7 @@ nzbget = None
 
 MEDIACONTAINER = (os.environ['NZBPO_MEDIAEXTENSIONS']).split(',')
 PROGRAM_DIR = os.path.normpath(os.path.abspath(os.path.join(__file__, os.pardir)))
+CHECKVIDEO = os.environ.get('NZBPO_CHECKVID', 'no') == 'yes'
 if os.environ.has_key('NZBPO_TESTVID') and os.path.isfile(os.environ['NZBPO_TESTVID']):
     TEST_FILE = os.environ['NZBPO_TESTVID']
 else:
@@ -129,7 +135,7 @@ FFPROBE = None
 if os.environ.has_key('NZBPO_FFPROBE') and os.environ['NZBPO_FFPROBE'] != "":
     if os.path.isfile(os.environ['NZBPO_FFPROBE']) or os.access(os.environ['NZBPO_FFPROBE'], os.X_OK):
         FFPROBE = os.environ['NZBPO_FFPROBE']
-if not FFPROBE:
+if CHECKVIDEO and not FFPROBE:
     if platform.system() == 'windows': 
         if os.path.isfile(os.path.join(PROGRAM_DIR, 'ffprobe.exe')):
             FFPROBE = os.path.join(PROGRAM_DIR, 'ffprobe.exe')
@@ -145,7 +151,7 @@ if not FFPROBE:
             try:
                 FFPROBE = subprocess.Popen(['which', 'avprobe'], stdout=subprocess.PIPE).communicate()[0].strip()
             except: pass
-if FFPROBE:
+if CHECKVIDEO and FFPROBE:
     result = 1
     devnull = open(os.devnull, 'w')
     try:
@@ -158,7 +164,7 @@ if FFPROBE:
     devnull.close()
     if result:
         FFPROBE = None
-if not FFPROBE:
+if CHECKVIDEO and not FFPROBE:
     print "[WARNING] Failed to locate ffprobe, video corruption detection disabled!"
     print "[WARNING] Install ffmpeg with x264 support to enable this feature  ..."
 
@@ -218,6 +224,8 @@ def getVideoDetails(videofile):
 
 def corruption_check():
     corrupt = False
+    if not CHECKVIDEO:
+        return corrupt
     if not TEST_FILE: 
         ffprobe_Tested = False
     elif isVideoGood(TEST_FILE):
