@@ -98,6 +98,7 @@ import subprocess
 import traceback
 import json
 import urllib2
+import ssl
 import cgi
 import shutil
 from subprocess import call
@@ -267,7 +268,14 @@ def downloadNzb(failure_link):
 	try:
 		headers = {'User-Agent' : 'NZBGet (FailureLink)'}
 		req = urllib2.Request(failure_link, None, headers)
-		response = urllib2.urlopen(req)
+		try:
+			response = urllib2.urlopen(req)
+		except:
+			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
+			context = ssl._create_unverified_context()
+			response = urllib2.urlopen(req, context=context)
+		else:
+			pass
 		if download_another_release:
 			nzbcontent = response.read()
 			headers = response.info()
