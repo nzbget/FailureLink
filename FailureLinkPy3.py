@@ -98,7 +98,7 @@ import platform
 import subprocess
 import traceback
 import json
-import urllib3.request, urllib3.error, urllib3.parse
+import urllib3
 import ssl
 import cgi
 import shutil
