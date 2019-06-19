@@ -272,7 +272,7 @@ def downloadNzb(failure_link):
 		try:
 			response = urllib.request.urlopen(req)
 		except:
-                        print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
+			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
 			context = ssl._create_unverified_context()
 			response = urllib.request.urlopen(req, context=context)
 		else:
