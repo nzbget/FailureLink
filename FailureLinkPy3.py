@@ -97,12 +97,12 @@ import platform
 import subprocess
 import traceback
 import json
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import ssl
 import cgi
 import shutil
 from subprocess import call
-from xmlrpclib import ServerProxy
+from xmlrpc.client import ServerProxy
 from base64 import standard_b64encode
 
 # Exit codes used by NZBGet
@@ -127,13 +127,13 @@ nzbget = None
 MEDIACONTAINER = (os.environ['NZBPO_MEDIAEXTENSIONS']).split(',')
 PROGRAM_DIR = os.path.normpath(os.path.abspath(os.path.join(__file__, os.pardir)))
 CHECKVIDEO = os.environ.get('NZBPO_CHECKVID', 'no') == 'yes'
-if os.environ.has_key('NZBPO_TESTVID') and os.path.isfile(os.environ['NZBPO_TESTVID']):
+if 'NZBPO_TESTVID' in os.environ and os.path.isfile(os.environ['NZBPO_TESTVID']):
     TEST_FILE = os.environ['NZBPO_TESTVID']
 else:
     TEST_FILE = None
 FFPROBE = None
 
-if os.environ.has_key('NZBPO_FFPROBE') and os.environ['NZBPO_FFPROBE'] != "":
+if 'NZBPO_FFPROBE' in os.environ and os.environ['NZBPO_FFPROBE'] != "":
     if os.path.isfile(os.environ['NZBPO_FFPROBE']) or os.access(os.environ['NZBPO_FFPROBE'], os.X_OK):
         FFPROBE = os.environ['NZBPO_FFPROBE']
 if CHECKVIDEO and not FFPROBE:
@@ -166,8 +166,8 @@ if CHECKVIDEO and FFPROBE:
     if result:
         FFPROBE = None
 if CHECKVIDEO and not FFPROBE:
-    print "[WARNING] Failed to locate ffprobe, video corruption detection disabled!"
-    print "[WARNING] Install ffmpeg with x264 support to enable this feature  ..."
+    print("[WARNING] Failed to locate ffprobe, video corruption detection disabled!")
+    print("[WARNING] Install ffmpeg with x264 support to enable this feature  ...")
 
 def isVideoGood(videofile):
     fileNameExt = os.path.basename(videofile)
@@ -176,23 +176,23 @@ def isVideoGood(videofile):
     if fileExt not in MEDIACONTAINER or not FFPROBE:
         return True
 
-    print "[INFO] Checking [%s] for corruption, please stand by ..." % (fileNameExt)
+    print("[INFO] Checking [%s] for corruption, please stand by ..." % (fileNameExt))
     video_details, result = getVideoDetails(videofile)
 
     if result != 0:
-        print "[Error] FAILED: [%s] is corrupted!" % (fileNameExt)
+        print("[Error] FAILED: [%s] is corrupted!" % (fileNameExt))
         return False
     if video_details.get("error"):
-        print "[INFO] FAILED: [%s] returned error [%s]." % (fileNameExt, str(video_details.get("error")))
+        print("[INFO] FAILED: [%s] returned error [%s]." % (fileNameExt, str(video_details.get("error"))))
         return False
     if video_details.get("streams"):
         videoStreams = [item for item in video_details["streams"] if item["codec_type"] == "video"]
         audioStreams = [item for item in video_details["streams"] if item["codec_type"] == "audio"]
         if len(videoStreams) > 0 and len(audioStreams) > 0:
-            print "[INFO] SUCCESS: [%s] has no corruption." % (fileNameExt)
+            print("[INFO] SUCCESS: [%s] has no corruption." % (fileNameExt))
             return True
         else:
-            print "[INFO] FAILED: [%s] has %s video streams and %s audio streams. Assume corruption." % (fileNameExt, str(len(videoStreams)), str(len(audioStreams)))
+            print("[INFO] FAILED: [%s] has %s video streams and %s audio streams. Assume corruption." % (fileNameExt, str(len(videoStreams)), str(len(audioStreams))))
             return False
 
 def getVideoDetails(videofile):
@@ -219,7 +219,7 @@ def getVideoDetails(videofile):
             result = proc.returncode
             video_details = json.loads(out)
         except:
-            print "[ERROR] Checking [%s] has failed" % (videofile)
+            print("[ERROR] Checking [%s] has failed" % (videofile))
     return video_details, result
 
 
@@ -232,7 +232,7 @@ def corruption_check():
     elif isVideoGood(TEST_FILE):
         ffprobe_Tested = True
     else:
-        print "[INFO] DISABLED: ffprobe failed to analyse streams from test file. Stopping corruption check."
+        print("[INFO] DISABLED: ffprobe failed to analyse streams from test file. Stopping corruption check.")
         return corrupt
    
     num_files = 0
@@ -246,7 +246,7 @@ def corruption_check():
             if isVideoGood(filepath):
                 good_files += 1
     if num_files > 0 and good_files < num_files:
-        print "[INFO] Corrupt video file found."
+        print("[INFO] Corrupt video file found.")
         corrupt = True
         # check for NZBGet V14+
         NZBGetVersion=os.environ['NZBOP_VERSION']
@@ -267,26 +267,26 @@ def downloadNzb(failure_link):
 	
 	try:
 		headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-		req = urllib2.Request(failure_link, None, headers)
+		req = urllib.request.Request(failure_link, None, headers)
 		try:
-			response = urllib2.urlopen(req)
+			response = urllib.request.urlopen(req)
 		except:
 			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
 			context = ssl._create_unverified_context()
-			response = urllib2.urlopen(req, context=context)
+			response = urllib.request.urlopen(req, context=context)
 		else:
 			pass
 		if download_another_release:
 			nzbcontent = response.read()
 			headers = response.info()
-	except urllib2.HTTPError, e:
+	except urllib.error.HTTPError as e:
 		if e.code == 404:
 			print('[INFO] No other releases found') 
 		else:
-			print('[ERROR] %s' % e.code)
+			print(('[ERROR] %s' % e.code))
 			sys.exit(POSTPROCESS_ERROR)
 	except Exception as err:
-		print('[ERROR] %s' % err)
+		print(('[ERROR] %s' % err))
 		sys.exit(POSTPROCESS_ERROR)
 
 	return nzbcontent, headers
@@ -331,7 +331,7 @@ def queueNzb(filename, category, nzbcontent64):
 			break;
 
 	if verbose:
-		print('GroupID: %i' % groupid)
+		print(('GroupID: %i' % groupid))
 
 	return groupid
 
@@ -339,12 +339,12 @@ def queueNzb(filename, category, nzbcontent64):
 def setupDnzbHeaders(groupid, headers):
 	for header in headers.headers:
 		if verbose:
-			print(header.strip())
+			print((header.strip()))
 		if header[0:7] == 'X-DNZB-':
 			name = header.split(':')[0].strip()
 			value = headers.get(name)
 			if verbose:
-				print('%s=%s' % (name, value))
+				print(('%s=%s' % (name, value)))
 				
 			# Setting "X-DNZB-" as post-processing parameter
 			param = '*DNZB:%s=%s' % (name[7:], value)
@@ -373,11 +373,11 @@ def onerror(func, path, exc_info):
 		raise
 
 def rmDir(dirName):
-	print("[INFO] Deleting %s" % (dirName))
+	print(("[INFO] Deleting %s" % (dirName)))
 	try:
 		shutil.rmtree(dirName, onerror=onerror)
 	except:
-		print("[ERROR] Unable to delete folder %s" % (dirName))
+		print(("[ERROR] Unable to delete folder %s" % (dirName)))
 
 def main():
         # Check par and unpack status for errors.
@@ -437,13 +437,13 @@ def main():
 
 	filename = params[1].get('filename', '')
 	if verbose:
-		print('filename: %s' % filename)
+		print(('filename: %s' % filename))
 	
 	# Parsing category from headers
 
 	category = headers.get('X-DNZB-Category', '');
 	if verbose:
-		print('category: %s' % category)
+		print(('category: %s' % category))
 
 	# Encode nzb-file content into base64
 	nzbcontent64=standard_b64encode(nzbcontent)
