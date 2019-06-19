@@ -44,7 +44,8 @@
 # RSS). NZB-files queued from local disk don't have enough information
 # to contact the indexer site.
 #
-# NOTE: This script requires Python 2.x to be installed on your system.
+# NOTE: This script requires Python 3.x to be installed on your system. This
+# is an experimental version for Python3.
 
 ##############################################################################
 ### OPTIONS                                                                ###
@@ -97,7 +98,7 @@ import platform
 import subprocess
 import traceback
 import json
-import urllib.request, urllib.error, urllib.parse
+import urllib3.request, urllib3.error, urllib3.parse
 import ssl
 import cgi
 import shutil
@@ -267,19 +268,20 @@ def downloadNzb(failure_link):
 	
 	try:
 		headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-		req = urllib.request.Request(failure_link, None, headers)
+		req = urllib3.request.Request(failure_link, None, headers)
 		try:
-			response = urllib.request.urlopen(req)
+			response = urllib3.request.urlopen(req)
 		except:
 			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
+			urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 			context = ssl._create_unverified_context()
-			response = urllib.request.urlopen(req, context=context)
+			response = urllib3.request.urlopen(req, context=context)
 		else:
 			pass
 		if download_another_release:
 			nzbcontent = response.read()
 			headers = response.info()
-	except urllib.error.HTTPError as e:
+	except urllib3.error.HTTPError as e:
 		if e.code == 404:
 			print('[INFO] No other releases found') 
 		else:
