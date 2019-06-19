@@ -98,7 +98,8 @@ import platform
 import subprocess
 import traceback
 import json
-import urllib3
+import urllib.request, urllib.error, urllib.parse
+import urllib2
 import ssl
 import cgi
 import shutil
@@ -268,20 +269,20 @@ def downloadNzb(failure_link):
 	
 	try:
 		headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-		req = urllib3.request.Request(failure_link, None, headers)
+		req = urllib.request.Request(failure_link, None, headers)
 		try:
-			response = urllib3.request.urlopen(req)
+			response = urllib.request.urlopen(req)
 		except:
 			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
-			urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+			urllib.disable_warnings(urllib.exceptions.InsecureRequestWarning)
 			context = ssl._create_unverified_context()
-			response = urllib3.request.urlopen(req, context=context)
+			response = urllib.request.urlopen(req, context=context)
 		else:
 			pass
 		if download_another_release:
 			nzbcontent = response.read()
 			headers = response.info()
-	except urllib3.error.HTTPError as e:
+	except urllib.error.HTTPError as e:
 		if e.code == 404:
 			print('[INFO] No other releases found') 
 		else:
