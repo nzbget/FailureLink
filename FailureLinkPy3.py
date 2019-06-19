@@ -99,7 +99,6 @@ import subprocess
 import traceback
 import json
 import urllib.request, urllib.error, urllib.parse
-import urllib2
 import ssl
 import cgi
 import shutil
@@ -274,8 +273,7 @@ def downloadNzb(failure_link):
 			response = urllib.request.urlopen(req)
 		except:
 			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
-			urllib.disable_warnings(urllib.exceptions.InsecureRequestWarning)
-			context = ssl._create_unverified_context()
+                        context = ssl._create_unverified_context()
 			response = urllib.request.urlopen(req, context=context)
 		else:
 			pass
