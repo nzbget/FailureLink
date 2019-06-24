@@ -45,7 +45,7 @@
 # to contact the indexer site.
 #
 # NOTE: This script requires Python 2.x to be installed on your system. Limited
-# support for Python3 has been added (https://github.com/bushbrother/FailureLink/)
+# support for Python3 has been added (http://github.com/bushbrother/FailureLink/)
 
 ##############################################################################
 ### OPTIONS                                                                ###
@@ -185,7 +185,7 @@ def isVideoGood(videofile):
         print ('[Error] FAILED: [%s] is corrupted!' % (fileNameExt))
         return False
     if video_details.get("error"):
-        print ('[INFO] FAILED: [%s] returned error [%s].' % (fileNameExt, str(video_details.get("error")))
+        print ('[INFO] FAILED: [%s] returned error [%s].' % (fileNameExt, str(video_details.get("error"))))
         return False
     if video_details.get("streams"):
         videoStreams = [item for item in video_details["streams"] if item["codec_type"] == "video"]
