@@ -105,8 +105,13 @@ import shutil
 import datetime
 import warnings
 from subprocess import call
-from xmlrpc.client import ServerProxy
 from base64 import standard_b64encode
+
+# Python2 xmlrpc handling
+try:
+    from xmlrpc.client import ServerProxy
+except ImportError:
+    from xmlrpclib import ServerProxy
 
 # Python2 urllib handling
 try:
