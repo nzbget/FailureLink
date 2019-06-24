@@ -92,6 +92,7 @@
 
 ### NZBGET POST-PROCESSING SCRIPT                                          ###
 ##############################################################################
+from __future__ import print_function
 import os
 import sys
 import platform
@@ -105,7 +106,6 @@ import shutil
 from subprocess import call
 from xmlrpclib import ServerProxy
 from base64 import standard_b64encode
-from __future__ import print_function
 
 # Exit codes used by NZBGet
 POSTPROCESS_SUCCESS=93
