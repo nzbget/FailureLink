@@ -438,28 +438,28 @@ def main():
                      print(params)
 
         filename = params[1].get('filename', '')
-		if verbose:
-				print('filename: %s' % filename)
+        if verbose:
+                     print('filename: %s' % filename)
 
-		# Parsing category from headers
+        # Parsing category from headers
 
-		category = headers.get('X-DNZB-Category', '');
-		if verbose:
-				print('category: %s' % category)
+        category = headers.get('X-DNZB-Category', '');
+        if verbose:
+                 print('category: %s' % category)
 
-		# Encode nzb-file content into base64
-		nzbcontent64=standard_b64encode(nzbcontent)
-		nzbcontent = None
+        # Encode nzb-file content into base64
+        nzbcontent64=standard_b64encode(nzbcontent)
+        nzbcontent = None
 
-		connectToNzbGet()
-		groupid = queueNzb(filename, category, nzbcontent64)
-		if groupid == 0:
-				print('[WARNING] Could not find added nzb-file in the list of downloads')
-				sys.stdout.flush()
-				sys.exit(POSTPROCESS_ERROR)
+        connectToNzbGet()
+        groupid = queueNzb(filename, category, nzbcontent64)
+        if groupid == 0:
+                print('[WARNING] Could not find added nzb-file in the list of downloads')
+                sys.stdout.flush()
+                sys.exit(POSTPROCESS_ERROR)
 
-		setupDnzbHeaders(groupid, headers)
-		unpauseGroup(groupid)
+        setupDnzbHeaders(groupid, headers)
+        unpauseGroup(groupid)
 main()
 
 # All OK, returning exit status 'POSTPROCESS_SUCCESS' (int <93>) to let NZBGet know
