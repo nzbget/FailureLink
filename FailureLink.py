@@ -99,7 +99,6 @@ import platform
 import subprocess
 import traceback
 import json
-import urllib.request, urllib.error, urllib.parse
 import ssl
 import cgi
 import shutil
