@@ -560,6 +560,7 @@ def main():
         #                       1 = unpack failed;
         #                       2 = unpack successful.
 	
+        print_statuses(show_expired=True)
         failure = os.environ['NZBPP_PARSTATUS'] == '1' or os.environ['NZBPP_UNPACKSTATUS'] == '1' or os.environ.get('NZBPP_PPSTATUS_FAKE') == 'yes'
         failure_link = os.environ.get('NZBPR__DNZB_FAILURE')
         if failure:
