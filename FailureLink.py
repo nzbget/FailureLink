@@ -405,39 +405,39 @@ def main():
             if corrupt and failure_link:
                 failure_link = failure_link + '&corrupt=true'
 
-		if not (failure or corrupt):
-				sys.exit(POSTPROCESS_SUCCESS)
+        if not (failure or corrupt):
+                sys.exit(POSTPROCESS_SUCCESS)
 
-		if delete and os.path.isdir(os.environ['NZBPP_DIRECTORY']):
-				rmDir(os.environ['NZBPP_DIRECTORY'])
+        if delete and os.path.isdir(os.environ['NZBPP_DIRECTORY']):
+                rmDir(os.environ['NZBPP_DIRECTORY'])
 
-		if not failure_link:
-				ys.exit(POSTPROCESS_SUCCESS)
-	
-		nzbcontent, headers = downloadNzb(failure_link)
+        if not failure_link:
+                sys.exit(POSTPROCESS_SUCCESS)
 
-		if not download_another_release:
-				sys.exit(POSTPROCESS_SUCCESS)
+        nzbcontent, headers = downloadNzb(failure_link)
+		
+        if not download_another_release:
+                sys.exit(POSTPROCESS_SUCCESS)
 
-		if verbose:
-				print(headers)
-	
-		if not nzbcontent or nzbcontent[0:5] != '<?xml':
-				print('[INFO] No other releases found')
-				if verbose and nzbcontent:
-					print(nzbcontent)
-				sys.exit(POSTPROCESS_SUCCESS)
-	
-		print('[INFO] Another release found, adding to queue')
-		sys.stdout.flush()
-	
-		# Parsing filename from headers
+        if verbose:
+                print(headers)
 
-		params = cgi.parse_header(headers.get('Content-Disposition', ''))
-		if verbose:
-				print(params)
+        if not nzbcontent or nzbcontent[0:5] != '<?xml':
+                print('[INFO] No other releases found')
+                if verbose and nzbcontent:
+                     print(nzbcontent)
+                sys.exit(POSTPROCESS_SUCCESS)
 
-		filename = params[1].get('filename', '')
+        print('[INFO] Another release found, adding to queue')
+        sys.stdout.flush()
+
+        # Parsing filename from headers
+
+        params = cgi.parse_header(headers.get('Content-Disposition', ''))
+        if verbose:
+                     print(params)
+
+        filename = params[1].get('filename', '')
 		if verbose:
 				print('filename: %s' % filename)
 
