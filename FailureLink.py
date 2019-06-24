@@ -104,14 +104,19 @@ import cgi
 import shutil
 import datetime
 import warnings
-from future.standard_library import install_aliases
-install_aliases()
-from urllib.parse import urlparse, urlencode
-from urllib.request import urlopen, Request
-from urllib.error import HTTPError
 from subprocess import call
 from xmlrpc.client import ServerProxy
 from base64 import standard_b64encode
+
+# Python2 urllib handling
+try:
+    from urllib.parse import urlparse, urlencode
+    from urllib.request import urlopen, Request
+    from urllib.error import HTTPError
+except ImportError:
+    from urlparse import urlparse
+    from urllib import urlencode
+    from urllib2 import urlopen, Request, HTTPError
 
 # Exit codes used by NZBGet
 POSTPROCESS_SUCCESS=93
