@@ -93,6 +93,10 @@
 ### NZBGET POST-PROCESSING SCRIPT                                          ###
 ##############################################################################
 from __future__ import print_function
+
+import eol
+eol.check()
+
 import os
 import sys
 import platform
