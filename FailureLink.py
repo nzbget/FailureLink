@@ -104,7 +104,7 @@ import ssl
 import cgi
 import shutil
 from subprocess import call
-from xmlrpclib import ServerProxy
+from xmlrpc.client import ServerProxy
 from base64 import standard_b64encode
 
 # Exit codes used by NZBGet
