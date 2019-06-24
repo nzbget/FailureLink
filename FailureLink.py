@@ -451,7 +451,7 @@ def expiration(version=None, grace_period=0):
     return days_left + grace_period
 
 
-def check(version=None, grace_period=0):
+def check_eol(version=None, grace_period=0):
     """
     Raise an exception if end of life has been reached and recommend upgrade.
     :param version: An optional tuple with version information
@@ -560,7 +560,7 @@ def main():
         #                       1 = unpack failed;
         #                       2 = unpack successful.
 	
-        print_statuses(show_expired=True)
+        check_eol()
         failure = os.environ['NZBPP_PARSTATUS'] == '1' or os.environ['NZBPP_UNPACKSTATUS'] == '1' or os.environ.get('NZBPP_PPSTATUS_FAKE') == 'yes'
         failure_link = os.environ.get('NZBPR__DNZB_FAILURE')
         if failure:
