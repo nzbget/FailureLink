@@ -129,13 +129,13 @@ nzbget = None
 MEDIACONTAINER = (os.environ['NZBPO_MEDIAEXTENSIONS']).split(',')
 PROGRAM_DIR = os.path.normpath(os.path.abspath(os.path.join(__file__, os.pardir)))
 CHECKVIDEO = os.environ.get('NZBPO_CHECKVID', 'no') == 'yes'
-if os.environ.has_key('NZBPO_TESTVID') and os.path.isfile(os.environ['NZBPO_TESTVID']):
+if 'NZBPO_TESTVID' in os.environ and os.path.isfile(os.environ['NZBPO_TESTVID']):
     TEST_FILE = os.environ['NZBPO_TESTVID']
 else:
     TEST_FILE = None
 FFPROBE = None
 
-if os.environ.has_key('NZBPO_FFPROBE') and os.environ['NZBPO_FFPROBE'] != "":
+if 'NZBPO_FFPROBE' in os.environ and os.environ['NZBPO_FFPROBE'] != "":
     if os.path.isfile(os.environ['NZBPO_FFPROBE']) or os.access(os.environ['NZBPO_FFPROBE'], os.X_OK):
         FFPROBE = os.environ['NZBPO_FFPROBE']
 if CHECKVIDEO and not FFPROBE:
