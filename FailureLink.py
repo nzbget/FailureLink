@@ -281,7 +281,7 @@ def downloadNzb(failure_link):
 		if download_another_release:
 			nzbcontent = response.read()
 			headers = response.info()
-	except urllib2.HTTPError, e:
+	except urllib.error.HTTPError as e:
 		if e.code == 404:
 			print('[INFO] No other releases found') 
 		else:
