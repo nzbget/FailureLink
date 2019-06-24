@@ -44,7 +44,8 @@
 # RSS). NZB-files queued from local disk don't have enough information
 # to contact the indexer site.
 #
-# NOTE: This script requires Python 2.x to be installed on your system.
+# NOTE: This script requires Python 2.x to be installed on your system. Limited
+# support for Python3 has been added (https://github.com/bushbrother/FailureLink/)
 
 ##############################################################################
 ### OPTIONS                                                                ###
@@ -104,6 +105,7 @@ import shutil
 from subprocess import call
 from xmlrpclib import ServerProxy
 from base64 import standard_b64encode
+from __future__ import print_function
 
 # Exit codes used by NZBGet
 POSTPROCESS_SUCCESS=93
@@ -166,8 +168,8 @@ if CHECKVIDEO and FFPROBE:
     if result:
         FFPROBE = None
 if CHECKVIDEO and not FFPROBE:
-    print "[WARNING] Failed to locate ffprobe, video corruption detection disabled!"
-    print "[WARNING] Install ffmpeg with x264 support to enable this feature  ..."
+    print ('[WARNING] Failed to locate ffprobe, video corruption detection disabled!')
+    print ('[WARNING] Install ffmpeg with x264 support to enable this feature  ...')
 
 def isVideoGood(videofile):
     fileNameExt = os.path.basename(videofile)
@@ -176,23 +178,23 @@ def isVideoGood(videofile):
     if fileExt not in MEDIACONTAINER or not FFPROBE:
         return True
 
-    print "[INFO] Checking [%s] for corruption, please stand by ..." % (fileNameExt)
+    print ("[INFO] Checking [%s] for corruption, please stand by ..." % (fileNameExt))
     video_details, result = getVideoDetails(videofile)
 
     if result != 0:
-        print "[Error] FAILED: [%s] is corrupted!" % (fileNameExt)
+        print ('[Error] FAILED: [%s] is corrupted!' % (fileNameExt))
         return False
     if video_details.get("error"):
-        print "[INFO] FAILED: [%s] returned error [%s]." % (fileNameExt, str(video_details.get("error")))
+        print ('[INFO] FAILED: [%s] returned error [%s].' % (fileNameExt, str(video_details.get("error")))
         return False
     if video_details.get("streams"):
         videoStreams = [item for item in video_details["streams"] if item["codec_type"] == "video"]
         audioStreams = [item for item in video_details["streams"] if item["codec_type"] == "audio"]
         if len(videoStreams) > 0 and len(audioStreams) > 0:
-            print "[INFO] SUCCESS: [%s] has no corruption." % (fileNameExt)
+            print ('[INFO] SUCCESS: [%s] has no corruption.' % (fileNameExt))
             return True
         else:
-            print "[INFO] FAILED: [%s] has %s video streams and %s audio streams. Assume corruption." % (fileNameExt, str(len(videoStreams)), str(len(audioStreams)))
+            print ('[INFO] FAILED: [%s] has %s video streams and %s audio streams. Assume corruption.' % (fileNameExt, str(len(videoStreams)), str(len(audioStreams))))
             return False
 
 def getVideoDetails(videofile):
@@ -219,7 +221,7 @@ def getVideoDetails(videofile):
             result = proc.returncode
             video_details = json.loads(out)
         except:
-            print "[ERROR] Checking [%s] has failed" % (videofile)
+            print ('[ERROR] Checking [%s] has failed' % (videofile))
     return video_details, result
 
 
@@ -232,7 +234,7 @@ def corruption_check():
     elif isVideoGood(TEST_FILE):
         ffprobe_Tested = True
     else:
-        print "[INFO] DISABLED: ffprobe failed to analyse streams from test file. Stopping corruption check."
+        print ('[INFO] DISABLED: ffprobe failed to analyse streams from test file. Stopping corruption check.')
         return corrupt
    
     num_files = 0
@@ -246,7 +248,7 @@ def corruption_check():
             if isVideoGood(filepath):
                 good_files += 1
     if num_files > 0 and good_files < num_files:
-        print "[INFO] Corrupt video file found."
+        print ('[INFO] Corrupt video file found.')
         corrupt = True
         # check for NZBGet V14+
         NZBGetVersion=os.environ['NZBOP_VERSION']
@@ -373,11 +375,11 @@ def onerror(func, path, exc_info):
 		raise
 
 def rmDir(dirName):
-	print("[INFO] Deleting %s" % (dirName))
+	print('[INFO] Deleting %s' % (dirName))
 	try:
 		shutil.rmtree(dirName, onerror=onerror)
 	except:
-		print("[ERROR] Unable to delete folder %s" % (dirName))
+		print('[ERROR] Unable to delete folder %s' % (dirName))
 
 def main():
         # Check par and unpack status for errors.
