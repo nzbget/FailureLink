@@ -115,6 +115,7 @@ try:
     from urllib.parse import urlparse, urlencode
     from urllib.request import urlopen, Request
     from urllib.error import HTTPError
+    PYTHON2=0
 except ImportError:
     from urlparse import urlparse
     from urllib import urlencode
