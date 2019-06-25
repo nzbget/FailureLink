@@ -44,8 +44,7 @@
 # RSS). NZB-files queued from local disk don't have enough information
 # to contact the indexer site.
 #
-# NOTE: This script requires Python 2.x to be installed on your system. Limited
-# support for Python3 has been added (http://github.com/bushbrother/FailureLink/)
+# NOTE: This script requires Python to be installed on your system.
 
 ##############################################################################
 ### OPTIONS                                                                ###
@@ -102,8 +101,6 @@ import json
 import ssl
 import cgi
 import shutil
-import datetime
-import warnings
 from subprocess import call
 from base64 import standard_b64encode
 
@@ -397,168 +394,6 @@ def rmDir(dirName):
 	except:
 		print('[ERROR] Unable to delete folder %s' % (dirName))
 
-__version__ = '1.0.0'
-
-def date(string, fmt='%Y-%m-%d'):
-    """
-    Convert date string to date.
-    :param string: A date string
-    :param fmt: Format to use when parsing the date string
-    :return: A datetime.date
-    """
-    return datetime.datetime.strptime(string, fmt).date()
-
-
-# https://devguide.python.org/
-# https://devguide.python.org/devcycle/#devcycle
-PYTHON_EOL = {
-    (3, 7): date('2023-06-27'),
-    (3, 6): date('2021-12-23'),
-    (3, 5): date('2020-09-13'),
-    (3, 4): date('2019-03-16'),
-    (3, 3): date('2017-09-29'),
-    (3, 2): date('2016-02-20'),
-    (3, 1): date('2012-04-09'),
-    (3, 0): date('2009-01-13'),
-    (2, 7): date('2020-01-01'),
-    (2, 6): date('2013-10-29'),
-}
-
-
-class Error(Exception):
-    """An error has occurred."""
-
-
-class LifetimeError(Error):
-    """Lifetime has been exceeded and upgrade is required."""
-
-
-class LifetimeWarning(Warning):
-    """Lifetime has been exceeded and is no longer supported."""
-
-
-def lifetime(version=None):
-    """
-    Calculate days left till End-of-Life for a version.
-    :param version: An optional tuple with version information
-        If a version is not provided, the current system version will be used.
-    :return: Days left until End-of-Life
-    """
-    if version is None:
-        version = sys.version_info
-    major = version[0]
-    minor = version[1]
-    now = datetime.datetime.now().date()
-    time_left = PYTHON_EOL[(major, minor)] - now
-    return time_left.days
-
-
-def expiration(version=None, grace_period=0):
-    """
-    Calculate expiration date for a version given a grace period.
-    :param version: An optional tuple with version information
-        If a version is not provided, the current system version will be used.
-    :param grace_period: An optional number of days grace period
-    :return: Total days till expiration
-    """
-    days_left = lifetime(version)
-    return days_left + grace_period
-
-
-def check_eol(version=None, grace_period=0):
-    """
-    Raise an exception if end of life has been reached and recommend upgrade.
-    :param version: An optional tuple with version information
-        If a version is not provided, the current system version will be used.
-    :param grace_period: An optional number of days grace period
-        If a grace period is not provided, a default 60 days grace period will
-        be used.
-    :return: None
-    """
-    try:
-        raise_for_status(version, grace_period)
-    except LifetimeError as error:
-        print('Please use a newer version of Python.')
-        print_statuses()
-        sys.exit(error)
-
-
-def raise_for_status(version=None, grace_period=0):
-    """
-    Raise an exception if end of life has been reached.
-    :param version: An optional tuple with version information
-        If a version is not provided, the current system version will be used.
-    :param grace_period: An optional number of days grace period
-        If a grace period is not provided, a default 60 days grace period will
-        be used.
-    :return: None
-    """
-    if version is None:
-        version = sys.version_info
-    days_left = lifetime(version)
-    expires = days_left + grace_period
-    if expires <= 0:
-        msg = 'Python {major}.{minor} is no longer supported.'.format(
-            major=version[0],
-            minor=version[1],
-        )
-        raise LifetimeError(msg)
-
-
-def warn_for_status(version=None, grace_period=0):
-    """
-    Warn if end of life has been reached.
-    :param version: An optional tuple with version information
-        If a version is not provided, the current system version will be used.
-    :param grace_period: An optional number of days grace period
-    :return: None
-    """
-    if version is None:
-        version = sys.version_info
-    days_left = lifetime(version)
-    expires = days_left + grace_period
-    if expires <= 0:
-        msg = 'Python {major}.{minor} is no longer supported.'.format(
-            major=version[0],
-            minor=version[1],
-        )
-        warnings.warn(msg, LifetimeWarning)
-
-
-def print_statuses(show_expired=False):
-    """
-    Print end-of-life statuses of known python versions.
-    :param show_expired: If true also print expired python version statuses
-    """
-    lifetimes = sorted(
-        (lifetime(python_version), python_version)
-        for python_version in PYTHON_EOL
-    )
-    print('Python End-of-Life for current versions:')
-    for days_left, python_version in lifetimes:
-        if days_left >= 0:
-            print(
-                'v{major}.{minor} in {remaining:>4} days'.format(
-                    major=python_version[0],
-                    minor=python_version[1],
-                    remaining=days_left,
-                )
-            )
-    if not show_expired:
-        return
-
-    print()
-    print('Python End-of-Life for expired versions:')
-    for days_left, python_version in lifetimes:
-        if days_left < 0:
-            print(
-                'v{major}.{minor} {remaining:>4} days ago'.format(
-                    major=python_version[0],
-                    minor=python_version[1],
-                    remaining=-days_left,
-                )
-            )
-
 def main():
         # Check par and unpack status for errors.
         #  NZBPP_PARSTATUS    - result of par-check:
@@ -574,7 +409,6 @@ def main():
         #                       1 = unpack failed;
         #                       2 = unpack successful.
 	
-        check_eol()
         failure = os.environ['NZBPP_PARSTATUS'] == '1' or os.environ['NZBPP_UNPACKSTATUS'] == '1' or os.environ.get('NZBPP_PPSTATUS_FAKE') == 'yes'
         failure_link = os.environ.get('NZBPR__DNZB_FAILURE')
         if failure:
@@ -584,61 +418,61 @@ def main():
             if corrupt and failure_link:
                 failure_link = failure_link + '&corrupt=true'
 
-        if not (failure or corrupt):
-                sys.exit(POSTPROCESS_SUCCESS)
+	if not (failure or corrupt):
+		sys.exit(POSTPROCESS_SUCCESS)
 
-        if delete and os.path.isdir(os.environ['NZBPP_DIRECTORY']):
-                rmDir(os.environ['NZBPP_DIRECTORY'])
+	if delete and os.path.isdir(os.environ['NZBPP_DIRECTORY']):
+		rmDir(os.environ['NZBPP_DIRECTORY'])
 
-        if not failure_link:
-                sys.exit(POSTPROCESS_SUCCESS)
+	if not failure_link:
+		sys.exit(POSTPROCESS_SUCCESS)
+	
+	nzbcontent, headers = downloadNzb(failure_link)
 
-        nzbcontent, headers = downloadNzb(failure_link)
-		
-        if not download_another_release:
-                sys.exit(POSTPROCESS_SUCCESS)
+	if not download_another_release:
+		sys.exit(POSTPROCESS_SUCCESS)
 
-        if verbose:
-                print(headers)
+	if verbose:
+		print(headers)
+	
+	if not nzbcontent or nzbcontent[0:5] != '<?xml':
+		print('[INFO] No other releases found')
+		if verbose and nzbcontent:
+			print(nzbcontent)
+		sys.exit(POSTPROCESS_SUCCESS)
+	
+	print('[INFO] Another release found, adding to queue')
+	sys.stdout.flush()
+	
+	# Parsing filename from headers
 
-        if not nzbcontent or nzbcontent[0:5] != '<?xml':
-                print('[INFO] No other releases found')
-                if verbose and nzbcontent:
-                     print(nzbcontent)
-                sys.exit(POSTPROCESS_SUCCESS)
+	params = cgi.parse_header(headers.get('Content-Disposition', ''))
+	if verbose:
+		print(params)
 
-        print('[INFO] Another release found, adding to queue')
-        sys.stdout.flush()
+	filename = params[1].get('filename', '')
+	if verbose:
+		print('filename: %s' % filename)
+	
+	# Parsing category from headers
 
-        # Parsing filename from headers
+	category = headers.get('X-DNZB-Category', '');
+	if verbose:
+		print('category: %s' % category)
 
-        params = cgi.parse_header(headers.get('Content-Disposition', ''))
-        if verbose:
-                     print(params)
+	# Encode nzb-file content into base64
+	nzbcontent64=standard_b64encode(nzbcontent)
+	nzbcontent = None
 
-        filename = params[1].get('filename', '')
-        if verbose:
-                     print('filename: %s' % filename)
+	connectToNzbGet()
+	groupid = queueNzb(filename, category, nzbcontent64)
+	if groupid == 0:
+		print('[WARNING] Could not find added nzb-file in the list of downloads')
+		sys.stdout.flush()
+		sys.exit(POSTPROCESS_ERROR)
 
-        # Parsing category from headers
-
-        category = headers.get('X-DNZB-Category', '');
-        if verbose:
-                 print('category: %s' % category)
-
-        # Encode nzb-file content into base64
-        nzbcontent64=standard_b64encode(nzbcontent)
-        nzbcontent = None
-
-        connectToNzbGet()
-        groupid = queueNzb(filename, category, nzbcontent64)
-        if groupid == 0:
-                print('[WARNING] Could not find added nzb-file in the list of downloads')
-                sys.stdout.flush()
-                sys.exit(POSTPROCESS_ERROR)
-
-        setupDnzbHeaders(groupid, headers)
-        unpauseGroup(groupid)
+	setupDnzbHeaders(groupid, headers)
+	unpauseGroup(groupid)
 main()
 
 # All OK, returning exit status 'POSTPROCESS_SUCCESS' (int <93>) to let NZBGet know
