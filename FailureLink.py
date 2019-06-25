@@ -133,24 +133,24 @@ if not 'NZBOP_FEEDHISTORY' in os.environ:
 
 # Init script config options
 verbose = False
-download_another_release = os.getenv('NZBPO_DOWNLOADANOTHERRELEASE', 'yes') == 'yes'
-verbose = os.getenv('NZBPO_VERBOSE', 'no') == 'yes'
-delete = os.getenv('NZBPO_DELETE', 'no') == 'yes'
+download_another_release = os.environ.get('NZBPO_DOWNLOADANOTHERRELEASE', 'yes') == 'yes'
+verbose = os.environ.get('NZBPO_VERBOSE', 'no') == 'yes'
+delete = os.environ.get('NZBPO_DELETE', 'no') == 'yes'
 
 nzbget = None
 
-MEDIACONTAINER = (os.getenv['NZBPO_MEDIAEXTENSIONS']).split(',')
+MEDIACONTAINER = (os.environ['NZBPO_MEDIAEXTENSIONS']).split(',')
 PROGRAM_DIR = os.path.normpath(os.path.abspath(os.path.join(__file__, os.pardir)))
-CHECKVIDEO = os.getenv('NZBPO_CHECKVID', 'no') == 'yes'
-if 'NZBPO_TESTVID' in os.environ and os.path.isfile(os.getenv['NZBPO_TESTVID']):
-    TEST_FILE = os.getenv['NZBPO_TESTVID']
+CHECKVIDEO = os.environ.get('NZBPO_CHECKVID', 'no') == 'yes'
+if 'NZBPO_TESTVID' in os.environ and os.path.isfile(os.environ['NZBPO_TESTVID']):
+    TEST_FILE = os.environ['NZBPO_TESTVID']
 else:
     TEST_FILE = None
 FFPROBE = None
 
-if 'NZBPO_FFPROBE' in os.environ and os.getenv['NZBPO_FFPROBE'] != "":
-    if os.path.isfile(os.getenv['NZBPO_FFPROBE']) or os.access(os.getenv['NZBPO_FFPROBE'], os.X_OK):
-        FFPROBE = os.getenv['NZBPO_FFPROBE']
+if 'NZBPO_FFPROBE' in os.environ and os.environ['NZBPO_FFPROBE'] != "":
+    if os.path.isfile(os.environ['NZBPO_FFPROBE']) or os.access(os.environ['NZBPO_FFPROBE'], os.X_OK):
+        FFPROBE = os.environ['NZBPO_FFPROBE']
 if CHECKVIDEO and not FFPROBE:
     if platform.system() == 'windows':
         if os.path.isfile(os.path.join(PROGRAM_DIR, 'ffprobe.exe')):
@@ -261,7 +261,7 @@ def corruption_check():
 
     num_files = 0
     good_files = 0
-    for dir, dirs, files in os.walk(os.getenv['NZBPP_DIRECTORY']):
+    for dir, dirs, files in os.walk(os.environ['NZBPP_DIRECTORY']):
         for file in files:
             if os.path.split(dir)[1][0] == '.':  # hidden directory.
                 continue
@@ -273,7 +273,7 @@ def corruption_check():
         print('[INFO] Corrupt video file found.')
         corrupt = True
         # check for NZBGet V14+
-        NZBGetVersion = os.getenv['NZBOP_VERSION']
+        NZBGetVersion = os.environ['NZBOP_VERSION']
         if NZBGetVersion[0:5] >= '14.0':
             print('[NZB] MARK=BAD')
     return corrupt
@@ -323,10 +323,10 @@ def connectToNzbGet():
     # First we need to know connection info: host, port and password of NZBGet server.
     # NZBGet passes all configuration options to post-processing script as
     # environment variables.
-    host = os.getenv['NZBOP_CONTROLIP'];
-    port = os.getenv['NZBOP_CONTROLPORT'];
-    username = os.getenv['NZBOP_CONTROLUSERNAME'];
-    password = os.getenv['NZBOP_CONTROLPASSWORD'];
+    host = os.environ['NZBOP_CONTROLIP'];
+    port = os.environ['NZBOP_CONTROLPORT'];
+    username = os.environ['NZBOP_CONTROLUSERNAME'];
+    password = os.environ['NZBOP_CONTROLPASSWORD'];
 
     if host == '0.0.0.0': host = '127.0.0.1'
 
@@ -422,9 +422,9 @@ def main():
     #                       1 = unpack failed;
     #                       2 = unpack successful.
 
-    failure = os.getenv['NZBPP_PARSTATUS'] == '1' or os.getenv['NZBPP_UNPACKSTATUS'] == '1' or os.getenv(
+    failure = os.environ['NZBPP_PARSTATUS'] == '1' or os.environ['NZBPP_UNPACKSTATUS'] == '1' or os.environ.get(
         'NZBPP_PPSTATUS_FAKE') == 'yes'
-    failure_link = os.getenv('NZBPR__DNZB_FAILURE')
+    failure_link = os.environ.get('NZBPR__DNZB_FAILURE')
     if failure:
         corrupt = False
     else:
@@ -435,8 +435,8 @@ def main():
     if not (failure or corrupt):
         sys.exit(POSTPROCESS_SUCCESS)
 
-    if delete and os.path.isdir(os.getenv['NZBPP_DIRECTORY']):
-        rmDir(os.getenv['NZBPP_DIRECTORY'])
+    if delete and os.path.isdir(os.environ['NZBPP_DIRECTORY']):
+        rmDir(os.environ['NZBPP_DIRECTORY'])
 
     if not failure_link:
         sys.exit(POSTPROCESS_SUCCESS)
