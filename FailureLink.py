@@ -126,7 +126,7 @@ POSTPROCESS_NONE = 95
 POSTPROCESS_ERROR = 94
 
 # Check if the script is called from nzbget 12.0 or later
-if not 'NZBOP_FEEDHISTORY' in os.getenv:
+if not 'NZBOP_FEEDHISTORY' in os.environ:
     print('*** NZBGet post-processing script ***')
     print('This script is supposed to be called from nzbget (12.0 or later).')
     sys.exit(POSTPROCESS_ERROR)
@@ -142,13 +142,13 @@ nzbget = None
 MEDIACONTAINER = (os.getenv['NZBPO_MEDIAEXTENSIONS']).split(',')
 PROGRAM_DIR = os.path.normpath(os.path.abspath(os.path.join(__file__, os.pardir)))
 CHECKVIDEO = os.getenv('NZBPO_CHECKVID', 'no') == 'yes'
-if 'NZBPO_TESTVID' in os.getenv and os.path.isfile(os.getenv['NZBPO_TESTVID']):
+if 'NZBPO_TESTVID' in os.environ and os.path.isfile(os.getenv['NZBPO_TESTVID']):
     TEST_FILE = os.getenv['NZBPO_TESTVID']
 else:
     TEST_FILE = None
 FFPROBE = None
 
-if 'NZBPO_FFPROBE' in os.getenv and os.getenv['NZBPO_FFPROBE'] != "":
+if 'NZBPO_FFPROBE' in os.environ and os.getenv['NZBPO_FFPROBE'] != "":
     if os.path.isfile(os.getenv['NZBPO_FFPROBE']) or os.access(os.getenv['NZBPO_FFPROBE'], os.X_OK):
         FFPROBE = os.getenv['NZBPO_FFPROBE']
 if CHECKVIDEO and not FFPROBE:
