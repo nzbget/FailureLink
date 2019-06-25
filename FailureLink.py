@@ -281,7 +281,7 @@ def downloadNzb(failure_link):
 	nzbcontent = None
 	headers = None
 	
-	if PYTHON2 = "1":
+	if PYTHON2 == '1':
 		try:
 				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
 				req = urllib2.Request(failure_link, None, headers)
