@@ -444,61 +444,61 @@ def main():
             if corrupt and failure_link:
                 failure_link = failure_link + '&corrupt=true'
 
-	if not (failure or corrupt):
-		sys.exit(POSTPROCESS_SUCCESS)
+        if not (failure or corrupt):
+                sys.exit(POSTPROCESS_SUCCESS)
 
-	if delete and os.path.isdir(os.environ['NZBPP_DIRECTORY']):
-		rmDir(os.environ['NZBPP_DIRECTORY'])
+        if delete and os.path.isdir(os.environ['NZBPP_DIRECTORY']):
+                rmDir(os.environ['NZBPP_DIRECTORY'])
 
-	if not failure_link:
-		sys.exit(POSTPROCESS_SUCCESS)
-	
-	nzbcontent, headers = downloadNzb(failure_link)
+        if not failure_link:
+                sys.exit(POSTPROCESS_SUCCESS)
 
-	if not download_another_release:
-		sys.exit(POSTPROCESS_SUCCESS)
+        nzbcontent, headers = downloadNzb(failure_link)
 
-	if verbose:
-		print(headers)
-	
-	if not nzbcontent or nzbcontent[0:5] != '<?xml':
-		print('[INFO] No other releases found')
-		if verbose and nzbcontent:
-			print(nzbcontent)
-		sys.exit(POSTPROCESS_SUCCESS)
-	
-	print('[INFO] Another release found, adding to queue')
-	sys.stdout.flush()
-	
-	# Parsing filename from headers
+        if not download_another_release:
+                sys.exit(POSTPROCESS_SUCCESS)
 
-	params = cgi.parse_header(headers.get('Content-Disposition', ''))
-	if verbose:
-		print(params)
+        if verbose:
+                print(headers)
 
-	filename = params[1].get('filename', '')
-	if verbose:
-		print('filename: %s' % filename)
-	
-	# Parsing category from headers
+        if not nzbcontent or nzbcontent[0:5] != '<?xml':
+                print('[INFO] No other releases found')
+                if verbose and nzbcontent:
+                        print(nzbcontent)
+                sys.exit(POSTPROCESS_SUCCESS)
 
-	category = headers.get('X-DNZB-Category', '');
-	if verbose:
-		print('category: %s' % category)
+        print('[INFO] Another release found, adding to queue')
+        sys.stdout.flush()
+        
+        # Parsing filename from headers
 
-	# Encode nzb-file content into base64
-	nzbcontent64=standard_b64encode(nzbcontent)
-	nzbcontent = None
+        params = cgi.parse_header(headers.get('Content-Disposition', ''))
+        if verbose:
+                print(params)
 
-	connectToNzbGet()
-	groupid = queueNzb(filename, category, nzbcontent64)
-	if groupid == 0:
-		print('[WARNING] Could not find added nzb-file in the list of downloads')
-		sys.stdout.flush()
-		sys.exit(POSTPROCESS_ERROR)
+        filename = params[1].get('filename', '')
+        if verbose:
+                print('filename: %s' % filename)
 
-	setupDnzbHeaders(groupid, headers)
-	unpauseGroup(groupid)
+        # Parsing category from headers
+
+        category = headers.get('X-DNZB-Category', '');
+        if verbose:
+                print('category: %s' % category)
+
+        # Encode nzb-file content into base64
+        nzbcontent64=standard_b64encode(nzbcontent)
+        nzbcontent = None
+
+        connectToNzbGet()
+        groupid = queueNzb(filename, category, nzbcontent64)
+        if groupid == 0:
+                print('[WARNING] Could not find added nzb-file in the list of downloads')
+                sys.stdout.flush()
+                sys.exit(POSTPROCESS_ERROR)
+
+        setupDnzbHeaders(groupid, headers)
+        unpauseGroup(groupid)
 main()
 
 # All OK, returning exit status 'POSTPROCESS_SUCCESS' (int <93>) to let NZBGet know
