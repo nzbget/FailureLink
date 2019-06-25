@@ -115,12 +115,10 @@ try:
     from urllib.parse import urlparse, urlencode
     from urllib.request import urlopen, Request
     from urllib.error import HTTPError
-    PYTHON2=0
 except ImportError:
     from urlparse import urlparse
     from urllib import urlencode
     from urllib2 import urlopen, Request, HTTPError
-    PYTHON2=1
 
 # Exit codes used by NZBGet
 POSTPROCESS_SUCCESS=93
@@ -282,22 +280,21 @@ def downloadNzb(failure_link):
 	nzbcontent = None
 	headers = None
 	
-	if PYTHON2 == '1':
 		try:
 				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-				req = urllib2.Request(failure_link, None, headers)
+				req = Request(failure_link, None, headers)
 				try:
-					response = urllib2.urlopen(req)
+					response = urlopen(req)
 				except:
 					print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
 					context = ssl._create_unverified_context()
-					response = urllib2.urlopen(req, context=context)
+					response = urlopen(req, context=context)
 				else:
 					pass
 				if download_another_release:
 					nzbcontent = response.read()
 					headers = response.info()
-		except urllib.error.HTTPError as e:
+		except error.HTTPError as e:
 				if e.code == 404:
 					print('[INFO] No other releases found') 
 				else:
@@ -306,33 +303,8 @@ def downloadNzb(failure_link):
 		except Exception as err:
 				print('[ERROR] %s' % err)
 				sys.exit(POSTPROCESS_ERROR)
-	else:
-		try:
-				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-				req = urllib.request.Request(failure_link, None, headers)
-				try:
-					response = urllib.request.urlopen(req)
-				except:
-					print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
-					context = ssl._create_unverified_context()
-					response = urllib.request.urlopen(req, context=context)
-				else:
-					pass
-				if download_another_release:
-					nzbcontent = response.read()
-					headers = response.info()
-		except urllib.error.HTTPError as e:
-				if e.code == 404:
-					print('[INFO] No other releases found') 
-				else:
-					print('[ERROR] %s' % e.code)
-					sys.exit(POSTPROCESS_ERROR)
-		except Exception as err:
-				print('[ERROR] %s' % err)
-				sys.exit(POSTPROCESS_ERROR)
-				
+                                
 	return nzbcontent, headers
-
 
 def connectToNzbGet():
 	global nzbget
