@@ -309,7 +309,7 @@ def downloadNzb(failure_link):
 	else:
 		try:
 				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-				req = urllib.Request(failure_link, None, headers)
+				req = urllib.request.Request(failure_link, None, headers)
 				try:
 					response = urllib.urlopen(req)
 				except:
