@@ -311,11 +311,11 @@ def downloadNzb(failure_link):
 				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
 				req = urllib.request.Request(failure_link, None, headers)
 				try:
-					response = urllib.urlopen(req)
+					response = urllib.request.urlopen(req)
 				except:
 					print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
 					context = ssl._create_unverified_context()
-					response = urllib.urlopen(req, context=context)
+					response = urllib.request.urlopen(req, context=context)
 				else:
 					pass
 				if download_another_release:
