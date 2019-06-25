@@ -280,30 +280,30 @@ def downloadNzb(failure_link):
 	nzbcontent = None
 	headers = None
 	
+        try:
+		headers = {'User-Agent' : 'NZBGet (FailureLink)'}
+		req = Request(failure_link, None, headers)
 		try:
-				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-				req = Request(failure_link, None, headers)
-				try:
-					response = urlopen(req)
-				except:
-					print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
-					context = ssl._create_unverified_context()
-					response = urlopen(req, context=context)
-				else:
-					pass
-				if download_another_release:
-					nzbcontent = response.read()
-					headers = response.info()
-		except error.HTTPError as e:
-				if e.code == 404:
-					print('[INFO] No other releases found') 
-				else:
-					print('[ERROR] %s' % e.code)
-					sys.exit(POSTPROCESS_ERROR)
-		except Exception as err:
-				print('[ERROR] %s' % err)
-				sys.exit(POSTPROCESS_ERROR)
-                                
+			response = urlopen(req)
+		except:
+			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
+			context = ssl._create_unverified_context()
+			response = urlopen(req, context=context)
+		else:
+			pass
+		if download_another_release:
+			nzbcontent = response.read()
+			headers = response.info()
+	except HTTPError as e:
+		if e.code == 404:
+			print('[INFO] No other releases found') 
+		else:
+			print(('[ERROR] %s' % e.code))
+			sys.exit(POSTPROCESS_ERROR)
+	except Exception as err:
+		print(('[ERROR] %s' % err))
+		sys.exit(POSTPROCESS_ERROR)
+
 	return nzbcontent, headers
 
 def connectToNzbGet():
