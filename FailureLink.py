@@ -139,7 +139,7 @@ delete = os.environ.get('NZBPO_DELETE', 'no') == 'yes'
 
 nzbget = None
 
-MEDIACONTAINER = (os.environ['NZBPO_MEDIAEXTENSIONS']).split(',')
+MEDIACONTAINER = (os.environ['NZBPO_MEDIAEXTENSIONS'], 'None').split(',')
 PROGRAM_DIR = os.path.normpath(os.path.abspath(os.path.join(__file__, os.pardir)))
 CHECKVIDEO = os.environ.get('NZBPO_CHECKVID', 'no') == 'yes'
 if 'NZBPO_TESTVID' in os.environ and os.path.isfile(os.environ['NZBPO_TESTVID']):
