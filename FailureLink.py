@@ -119,6 +119,7 @@ except ImportError:
     from urlparse import urlparse
     from urllib import urlencode
     from urllib2 import urlopen, Request, HTTPError
+    PYTHON2=1
 
 # Exit codes used by NZBGet
 POSTPROCESS_SUCCESS=93
@@ -280,30 +281,55 @@ def downloadNzb(failure_link):
 	nzbcontent = None
 	headers = None
 	
-	try:
-		headers = {'User-Agent' : 'NZBGet (FailureLink)'}
-		req = urllib2.Request(failure_link, None, headers)
+	if PYTHON2 = "1":
 		try:
-			response = urllib2.urlopen(req)
-		except:
-			print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
-			context = ssl._create_unverified_context()
-			response = urllib2.urlopen(req, context=context)
-		else:
-			pass
-		if download_another_release:
-			nzbcontent = response.read()
-			headers = response.info()
-	except urllib.error.HTTPError as e:
-		if e.code == 404:
-			print('[INFO] No other releases found') 
-		else:
-			print('[ERROR] %s' % e.code)
-			sys.exit(POSTPROCESS_ERROR)
-	except Exception as err:
-		print('[ERROR] %s' % err)
-		sys.exit(POSTPROCESS_ERROR)
-
+				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
+				req = urllib2.Request(failure_link, None, headers)
+				try:
+					response = urllib2.urlopen(req)
+				except:
+					print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
+					context = ssl._create_unverified_context()
+					response = urllib2.urlopen(req, context=context)
+				else:
+					pass
+				if download_another_release:
+					nzbcontent = response.read()
+					headers = response.info()
+		except urllib.error.HTTPError as e:
+				if e.code == 404:
+					print('[INFO] No other releases found') 
+				else:
+					print('[ERROR] %s' % e.code)
+					sys.exit(POSTPROCESS_ERROR)
+		except Exception as err:
+				print('[ERROR] %s' % err)
+				sys.exit(POSTPROCESS_ERROR)
+	else:
+		try:
+				headers = {'User-Agent' : 'NZBGet (FailureLink)'}
+				req = urllib.Request(failure_link, None, headers)
+				try:
+					response = urllib.urlopen(req)
+				except:
+					print('[WARNING] SSL certificate verify failed, retry with bypass SSL cert.')
+					context = ssl._create_unverified_context()
+					response = urllib.urlopen(req, context=context)
+				else:
+					pass
+				if download_another_release:
+					nzbcontent = response.read()
+					headers = response.info()
+		except urllib.error.HTTPError as e:
+				if e.code == 404:
+					print('[INFO] No other releases found') 
+				else:
+					print('[ERROR] %s' % e.code)
+					sys.exit(POSTPROCESS_ERROR)
+		except Exception as err:
+				print('[ERROR] %s' % err)
+				sys.exit(POSTPROCESS_ERROR)
+				
 	return nzbcontent, headers
 
 
