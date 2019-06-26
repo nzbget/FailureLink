@@ -139,7 +139,7 @@ delete = os.environ.get('NZBPO_DELETE', 'no') == 'yes'
 
 nzbget = None
 
-MEDIACONTAINER = (os.environ['NZBPO_MEDIAEXTENSIONS']).split(',')
+MEDIACONTAINER = (os.environ.get('NZBPO_MEDIAEXTENSIONS', 'False')).split(',')
 PROGRAM_DIR = os.path.normpath(os.path.abspath(os.path.join(__file__, os.pardir)))
 CHECKVIDEO = os.environ.get('NZBPO_CHECKVID', 'no') == 'yes'
 if 'NZBPO_TESTVID' in os.environ and os.path.isfile(os.environ['NZBPO_TESTVID']):
@@ -422,7 +422,7 @@ def main():
     #                       1 = unpack failed;
     #                       2 = unpack successful.
 
-    failure = os.environ['NZBPP_PARSTATUS'] == '1' or os.environ['NZBPP_UNPACKSTATUS'] == '1' or os.environ.get(
+    failure = os.environ.get('NZBPP_PARSTATUS', 'False') == '1' or os.environ.get('NZBPP_UNPACKSTATUS', 'False') == '1' or os.environ.get(
         'NZBPP_PPSTATUS_FAKE') == 'yes'
     failure_link = os.environ.get('NZBPR__DNZB_FAILURE')
     if failure:
