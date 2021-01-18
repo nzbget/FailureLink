@@ -56,38 +56,38 @@
 # If the NZB download of a Movie or TV Show fails, request an alternate
 # NZB-file of the same release and add it to queue. If disabled the indexer
 # site is still informed about the failure but no other nzb-file is queued.
-# DownloadAnotherRelease=no
+#DownloadAnotherRelease=no
 
 # Cleanup Directory (yes, no).
 #
 # Set this to yes in order to delete all corrupt and failed Files
-# Delete=no
+#Delete=no
 
 # Print more logging messages (yes, no).
 #
 # For debugging or if you need to report a bug.
-# Verbose=no
+#Verbose=no
 
 # Check videos for corruption (yes, no).
 #
 # If disabled, ignore the settings below.
-# CheckVid=no
+#CheckVid=no
 
 # Absolute path for ffprobe.
 #
 # Enter the full path to ffprobe or avprobe here, or leave blank to search your system path.
-# ffprobe=
+#ffprobe=
 
 # Absolute path for known good video.
 #
 # This is optional and is only needed to test if ffprobe is correctly compiled and working.
 # Enter the full path to a valid video file.
-# testVid=
+#testVid=
 
 # Media Extensions
 #
 # This is a list of video/media extensions that will be checked for corruption.
-# mediaExtensions=.mkv,.avi,.divx,.xvid,.mov,.wmv,.mp4,.mpg,.mpeg,.vob,.ts
+#mediaExtensions=.mkv,.avi,.divx,.xvid,.mov,.wmv,.mp4,.mpg,.mpeg,.vob,.ts
 
 ### NZBGET POST-PROCESSING SCRIPT                                          ###
 ##############################################################################
